@@ -64,3 +64,6 @@ $ ansible-playbook /etc/ansible/roles/bianchi-aws-mxservers/bianchi-aws-mxserver
 
 - do not run ANY of your EC2 instances with the ec2user and ANY of the default users provided by ANY of the exeisting AMIs. Create your own user with a strong passphrased SSH key and remove the ec2-user;
 - do not agree just on NACL or Security Groups, you need firewall also on instances. I recommend you to configure fail2ban to dynamically filter ban/unban IPs scanning ports of your instances.
+
+***Access the Gist with the roles execution output***
+https://gist.github.com/wagnerbianchijr/d9a3ae8db80fd5a9c92e328aa6e281b4
