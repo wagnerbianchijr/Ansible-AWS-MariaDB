@@ -1,4 +1,4 @@
-# Ansible-AWS-and-MariaDB
+# Ansible-AWS-MariaDB
 Ansible Roles for creating an AWS simple infrastructure, with instances with MariaDB in replication and a MaxScale with MariaDBMon and ReadWriteSplit Router. Before starting up running Ansible Roles to bootstrap resources on your behalf calling the AWS API, make sure you create a user with Programmatic Access and add the best policy/permission. After creating the user, make sure you download the .csv file as when you get off that page, you won't see it again! The vars you need to configure is at bianchi-aws-bootstrap/vars/main.yml, as below:
 
 ```
