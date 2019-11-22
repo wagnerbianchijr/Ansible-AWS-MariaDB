@@ -1,0 +1,33 @@
+#: DON'T EDIT THIS ONE, IT WAS CREATED BY ANSIBLE
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+#: BIANCHI SETTINGS FOR THE COLOURED BASH
+RESET="\[\033[0m\]"
+COLOR_USER="\[\033[0;36m\]"
+COLOR_HOST="\[\033[1;31m\]"
+COLOR_DIR="\[\033[0;33m\]"
+COLOR_CMD="\[\033[0;37;00m\]"
+COLOR_CLIENT="\[\033[1;32m\]"
+RDBA_HOSTNAME=jumphost
+CLIENT="BIANCHI LABS - {{ inventory_hostname }}"
+
+export PS1="[${COLOR_CLIENT}${CLIENT}${RESET}] ${COLOR_USER}\u${RESET}@${COLOR_HOST}${RDBA_HOSTNAME}${RESET}: ${COLOR_DIR}\W ${RESET}\\$ ${COLOR_CMD}"
+
+export HISTTIMEFORMAT=': %Y-%m-%d_%H:%M:%S; '
+export HISTIGNORE="&:ls:ll:[bf]g:w:who:exit:history"
+export HISTSIZE=50000
+
+if [ -x /bin/vi ]; then
+    export EDITOR=/bin/vi
+elif [ -x /usr/bin/vi ]; then
+    export EDITOR=/usr/bin/vi
+fi
+
+#: ADDED PATH DIRECTORIES
+PATH=$PATH:$HOME/bin
+
+export PATH

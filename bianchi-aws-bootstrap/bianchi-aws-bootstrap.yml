@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  become: yes
+  connection: ssh
+  gather_facts: yes
+  roles:
+    - bianchi-aws-bootstrap

@@ -1,0 +1,26 @@
+---
+# vars file for /etc/ansible/roles/aws-bootstrap
+
+#: credentials
+aws_access_key: ""
+aws_secret_key: ""
+region: ""
+az: ""
+
+vpc_cidr: 10.0.0.0/16
+vpc_name: "MyVPC"
+
+subnet_name: "MySBT01-public"
+subnet_cidr: 10.0.1.0/24
+
+igw_name:    "MyIGW" 
+
+route_name: "MyRT"
+
+securitygroup_name: "MySG"
+
+ec2_ami: "ami-0102667d2046392a0"
+ec2_tag: "MariaDB"
+ec2_key_directory: "/home/ansible/aws_sp/"
+
+keypair_name: "ansible"

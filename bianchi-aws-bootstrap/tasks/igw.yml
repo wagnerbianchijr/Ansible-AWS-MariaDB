@@ -1,0 +1,18 @@
+- name: Creating the IGW (Internet Gateway)
+  ec2_vpc_igw:
+   vpc_id: "{{ vpc_id }}"
+   region: "{{ region }}"
+   aws_access_key: "{{ aws_access_key }}"
+   aws_secret_key: "{{ aws_secret_key }}"
+   state: "present"
+   tags:
+     Name: "{{ igw_name }}"
+  register: igw
+  tags:
+    - igw
+
+#- debug: msg="{{ igw.gateway_id }}"
+
+- name: Setting new fact for the Internet Gateway
+  set_fact:
+    igw_id: "{{ igw.gateway_id }}"

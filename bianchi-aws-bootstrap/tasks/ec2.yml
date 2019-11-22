@@ -1,0 +1,181 @@
+#: creating database servers and adding them to the 
+#: local static inventory at /etc/ansible/hosts
+#
+#: dbserver01
+- name: Creating EC2 instances for MariaDB Servers ([dbserver01])
+  ec2:
+    image: "{{ ec2_ami }}"
+    wait: yes
+    instance_type: t2.micro
+    group_id: "{{ sgp_id }}"
+    vpc_subnet_id: "{{ sbt_id }}"
+    key_name: "{{ keypair_name  }}"
+    #user_data: "{{ lookup('file', 'mariadb_srv_setup.sh') }}"
+    instance_tags:
+      Name: dbserver01
+    count: 1
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: 10
+        delete_on_termination: true
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ region }}"
+  register: cmd_ec2_db01
+
+- name: Add host to a temp inventory
+  add_host:
+    hostname: '{{ item.public_ip }}'
+    groupname: dbservers
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_private_key_file: /home/ansible/aws_sp/ansible
+  loop: '{{ cmd_ec2_db01.instances }}'
+
+- name: Adding the dbservers to the static inventory file ([dbservers])
+  lineinfile:
+    path: /etc/ansible/hosts
+    regexp: '^dbservers'
+    insertafter: '^#dbservers'
+    line: "dbserver01 ansible_ssh_host={{ item.public_ip }} ansible_ssh_port=22"
+    state: present
+  with_items: "{{ cmd_ec2_db01.instances }}"
+
+- name: Adjusting the local DNS
+  shell: echo "{{ item.public_ip }}  dbserver01" >> /etc/hosts
+  with_items: "{{ cmd_ec2_db01.instances }}"
+
+#: dbserver02
+- name: Creating EC2 instances for MariaDB Servers ([dbserver02])
+  ec2:
+    image: "{{ ec2_ami }}"
+    wait: yes
+    instance_type: t2.micro
+    group_id: "{{ sgp_id }}"
+    vpc_subnet_id: "{{ sbt_id }}"
+    key_name: "{{ keypair_name  }}"
+    #user_data: "{{ lookup('file', 'mariadb_srv_setup.sh') }}"
+    instance_tags:
+      Name: dbserver02
+    count: 1
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: 10
+        delete_on_termination: true
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ region }}"
+  register: cmd_ec2_db02
+
+- name: Add host to a temp inventory
+  add_host:
+    hostname: '{{ item.public_ip }}'
+    groupname: dbservers
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_private_key_file: /home/ansible/aws_sp/ansible
+  loop: '{{ cmd_ec2_db02.instances }}'
+
+- name: Adding the dbservers to the static inventory file ([dbservers])
+  lineinfile:
+    path: /etc/ansible/hosts
+    regexp: '^dbservers'
+    insertafter: '^#dbservers'
+    line: "dbserver02 ansible_ssh_host={{ item.public_ip }} ansible_ssh_port=22"
+    state: present
+  with_items: "{{ cmd_ec2_db02.instances }}"
+
+- name: Adjusting the local DNS
+  shell: echo "{{ item.public_ip }}  dbserver02" >> /etc/hosts
+  with_items: "{{ cmd_ec2_db02.instances }}"
+
+#: dbserver03
+- name: Creating EC2 instances for MariaDB Servers ([dbserver03])
+  ec2:
+    image: "{{ ec2_ami }}"
+    wait: yes
+    instance_type: t2.micro
+    group_id: "{{ sgp_id }}"
+    vpc_subnet_id: "{{ sbt_id }}"
+    key_name: "{{ keypair_name  }}"
+    #user_data: "{{ lookup('file', 'mariadb_srv_setup.sh') }}"
+    instance_tags:
+      Name: dbserver03
+    count: 1
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: 10
+        delete_on_termination: true
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ region }}"
+  register: cmd_ec2_db03
+
+- name: Add host to a temp inventory
+  add_host:
+    hostname: '{{ item.public_ip }}'
+    groupname: dbservers
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_private_key_file: /home/ansible/aws_sp/ansible
+  loop: '{{ cmd_ec2_db03.instances }}'
+
+- name: Adding the dbservers to the static inventory file ([dbservers])
+  lineinfile:
+    path: /etc/ansible/hosts
+    regexp: '^dbservers'
+    insertafter: '^#dbservers'
+    line: "dbserver03 ansible_ssh_host={{ item.public_ip }} ansible_ssh_port=22"
+    state: present
+  with_items: "{{ cmd_ec2_db03.instances }}"
+
+- name: Adjusting the local DNS
+  shell: echo "{{ item.public_ip }}  dbserver03" >> /etc/hosts
+  with_items: "{{ cmd_ec2_db03.instances }}"
+
+#: --------------------------------------------------------------------
+
+- name: Creating an EC2 instance for MariaDB MaxScale
+  ec2:
+    image: "{{ ec2_ami }}"
+    wait: yes
+    instance_type: t2.micro
+    group_id: "{{ sgp_id }}"
+    vpc_subnet_id: "{{ sbt_id }}"
+    key_name: "{{ keypair_name  }}"
+    #user_data: "{{ lookup('file', 'mariadb_mxs_setup.sh') }}"
+    instance_tags:
+      Name: mxserver01
+    count: 1
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: 10
+        encrypted: True
+        key: aws/ebs
+        delete_on_termination: true
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    region: "{{ region }}"
+  register: cmd_ec2_mx
+
+- name: Add hosts to a temp inventory
+  add_host:
+    hostname: '{{ item.public_ip }}'
+    groupname: mxservers
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_private_key_file: /home/ansible/aws_sp/ansible
+  loop: '{{ cmd_ec2_mx.instances }}'
+
+- name: Adding the mxserver to the static inventory file
+  lineinfile:
+    path: /etc/ansible/hosts
+    regexp: '^mxservers'
+    insertafter: '^#mxservers'
+    line: "mxserver01 ansible_ssh_host={{ item.public_ip }} ansible_ssh_port=22"
+    state: present
+  with_items: "{{ cmd_ec2_mx.instances }}"
+
+- name: Adjusting the local DNS
+  shell: echo "{{ item.public_ip }}  mxserver01" >> /etc/hosts
+  with_items: "{{ cmd_ec2_mx.instances }}"

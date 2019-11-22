@@ -1,0 +1,23 @@
+[mysqld]
+plugin_maturity="beta"
+user=mysql
+basedir=/usr
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+server_id="{{ ansible_default_ipv4.address | replace('.','') }}"
+report_host="{{ inventory_hostname }}"
+binlog_format=ROW
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+log_bin=/var/lib/mysql/mariadb-bin.log
+log_bin_index=/var/lib/mysql/mariadb-bin.index
+relay_log=/var/lib/mysql/mariadb-relay.log
+relay_log_index=mariadb-relay.index
+log_error=/tmp/mysqld.err
+log_slave_updates=1
+gtid_strict_mode=1
+bind-address=0.0.0.0
+
+[mysql]
+socket=/var/lib/mysql/mysql.sock
+prompt="\H [\d]>\_"

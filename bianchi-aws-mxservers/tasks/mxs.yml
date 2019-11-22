@@ -1,0 +1,87 @@
+#: msc -> miscelaneous
+- name: Setting the motd per customer
+  template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Adjusting users bash_profile
+  template:
+    src: bash_profile.j2
+    dest: "{{ item.path }}.bash_profile"
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: '0644'
+  with_items: "{{ users }}"
+
+- name: Setup the Epel-Release repo
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+    state: present
+  ignore_errors: yes
+
+- name: Adding the MariaDB Official Repository
+  raw: curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+  register: cmd_add_repo
+
+#- debug: msg="{{ cmd_add_repo }}"
+
+- name: Adding needed packages
+  yum:
+    name: ['rsync','wget','psmisc','net-tools','vim','htop','iptraf','iftop','socat','MySQL-python','python-netaddr']
+    state: latest
+
+- name: Setting up the MariaDB MaxScale Packages
+  yum:
+    name: ['maxscale','maxscale-experimental','MariaDB-client']
+    state: latest
+
+- name: Executing the maxkeys
+  shell: maxkeys
+  register: cmd_maxkeys
+
+- name: Changing the ownership of the .secrets file
+  file:
+    path: /var/lib/maxscale/.secrets
+    owner: maxscale
+    group: maxscale
+    mode: 0400  
+
+- debug: msg="{{cmd_maxkeys.stderr_lines}}"
+
+- name: Executing the maxpasswd for users (maxusr)
+  shell: maxpasswd 123
+  register: cmd_maxpasswd_maxusr
+
+- debug: msg="{{cmd_maxpasswd_maxusr.stdout}}"
+
+- name: Executing the maxpasswd for users (mariadb)
+  shell: maxpasswd 123
+  register: cmd_maxpasswd_mariadb
+
+- debug: msg="{{cmd_maxpasswd_mariadb.stdout}}"
+
+- name: Executing the maxpasswd for users (maxmon)
+  shell: maxpasswd 321
+  register: cmd_maxpasswd_maxmon
+
+- debug: msg="{{cmd_maxpasswd_maxmon.stdout}}"
+
+- name: Adding Database Servers configuration files
+  template:
+    src: maxscale.j2
+    dest: /etc/maxscale.cnf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restarting and reloading the maxscale.service deamon
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: maxscale
+  register: cmd_maxscale_restart
+
+#- debug: msg="{{ cmd_maxscale_restart.state }}"

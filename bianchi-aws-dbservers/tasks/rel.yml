@@ -1,0 +1,42 @@
+#: setting up replication
+- name: Getting the Master database server's private ip ([dbserver01])
+  set_fact:
+    master_private_ip: "{{ ansible_all_ipv4_addresses | ipaddr('private') | first }}"
+  when: inventory_hostname == 'dbserver01'
+
+#- debug: msg="{{hostvars['dbserver01']['master_private_ip']}}"
+#  when: inventory_hostname == 'dbserver02'
+
+- name: Setting up replication on dbserver02
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{hostvars['dbserver01']['master_private_ip']}}"
+    master_user: mariadb
+    master_password: 123
+    master_log_file: mariadb-bin.000001
+    master_log_pos: 4
+  register: cmd_change_master_dbserver02
+  when: inventory_hostname == 'dbserver02'
+
+- name: Start replication on dbserver02
+  mysql_replication:
+    mode: startslave
+  register: cmd_startslave_dbserver02
+  when: inventory_hostname == 'dbserver02'
+
+- name: Setting up replication on dbserver03
+  mysql_replication:
+    mode: changemaster
+    master_host: "{{hostvars['dbserver01']['master_private_ip']}}"
+    master_user: mariadb
+    master_password: 123
+    master_log_file: mariadb-bin.000001
+    master_log_pos: 4
+  register: cmd_change_master_dbserver03
+  when: inventory_hostname == 'dbserver03'
+
+- name: Start replication on dbserver03
+  mysql_replication:
+    mode: startslave
+  register: cmd_startslave_dbserver03
+  when: inventory_hostname == 'dbserver03'

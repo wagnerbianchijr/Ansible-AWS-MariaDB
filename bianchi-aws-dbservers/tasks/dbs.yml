@@ -1,0 +1,61 @@
+#: msc -> miscelaneous
+- name: Setting the motd per customer
+  template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Setup the Epel-Release repo
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+    state: present
+  ignore_errors: yes
+
+- name: Adding the MariaDB Official Repository
+  copy:
+    src: mariadb.repo
+    dest: /etc/yum.repos.d/mariadb.repo
+    owner: root
+    group: root
+    mode: '0644'
+  register: cmd_add_repo
+
+#- debug: msg="{{ cmd_add_repo }}"
+
+- name: Adding needed packages
+  yum:
+    name: ['rsync','wget','psmisc','net-tools','vim','htop','iptraf','iftop','socat','MySQL-python','python-netaddr']
+    state: latest
+
+- name: Setting up the MariaDB Packages
+  yum:
+    name: ['MariaDB-client','MariaDB-server','MariaDB-backup']
+    state: latest
+
+- name: Adding Database Servers configuration files
+  template:
+    src: server.j2
+    dest: /etc/my.cnf.d/server.cnf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Adjusting users bash_profile
+  template:
+    src: bash_profile.j2
+    dest: "{{ item.path }}.bash_profile"
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: '0644'
+  with_items: "{{ users }}"
+
+- name: Retsarting and reloading the mariadb.service deamon
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: mariadb
+  register: cmd_mariadb_restart
+
+#- debug: msg="{{ cmd_mariadb_restart.state }}"

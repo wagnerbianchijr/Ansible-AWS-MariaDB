@@ -1,0 +1,27 @@
+- name: Creating a new VPC
+  ec2_vpc_net:
+    name: "{{ vpc_name }}"
+    cidr_block: "{{ vpc_cidr }}"
+    region: "{{ region }}"
+    state: present
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+  register: cmd_vpc
+  tags:
+    - vpc
+
+#: debug
+#- debug: msg="{{ cmd_vpc.vpc.id }}"
+#  tags:
+#    - vpc
+
+- name: Setting the VPC ID fact 
+  set_fact: 
+    vpc_id: "{{ cmd_vpc.vpc.id }}"
+  tags:
+    - vpc
+
+#: debug setting facts
+#- debug: msg="{{ vpc_id }}"
+#  tags:
+#    - vpc

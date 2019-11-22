@@ -1,0 +1,6 @@
+---
+- hosts: mxservers
+  become: yes
+  gather_facts: yes
+  roles:
+    - bianchi-aws-mxservers

@@ -1,0 +1,107 @@
+[maxscale]
+threads                     = auto
+log_augmentation            = 1
+ms_timestamp                = 1
+syslog                      = 1
+
+[replication-cluster-monitor]
+type=monitor
+module=mariadbmon
+user=maxmon
+password={{ cmd_maxpasswd_maxmon.stdout }}
+servers=dbserver01,dbserver02,dbserver03
+monitor_interval=1000
+backend_connect_timeout=3s
+backend_read_timeout=1s
+backend_write_timeout=2s
+backend_connect_attempts=1
+journal_max_age=28800s
+disk_space_check_interval=0ms
+script_timeout=90s
+events=all
+detect_stale_master=true
+detect_stale_slave=true
+detect_standalone_master=true
+failcount=3
+ignore_external_masters=false
+auto_failover=true
+failover_timeout=90s
+switchover_timeout=90s
+replication_user=mariadb
+replication_password={{ cmd_maxpasswd_mariadb.stdout }}
+replication_master_ssl=false
+verify_master_failure=true
+master_failure_timeout=10s
+auto_rejoin=true
+enforce_read_only_slaves=true
+switchover_on_low_disk_space=false
+maintenance_on_low_disk_space=true
+handle_events=true
+assume_unique_hostnames=true
+enforce_simple_topology=false
+
+[rwsplit-service]
+type                        = service
+router                      = readwritesplit
+user                        = maxusr
+password                    = {{ cmd_maxpasswd_maxusr.stdout }}
+max_sescmd_history          = 1500
+prune_sescmd_history        = true
+master_reconnection         = true
+master_failure_mode         = fail_on_write
+
+[rwsplit-listener]
+type=listener
+address=::
+port=3306
+protocol=mariadbclient
+service=rwsplit-service
+ssl=false
+ssl_cert_verify_depth=9
+ssl_verify_peer_certificate=true
+ssl_version=MAX
+
+[dbserver01]
+type=server
+address=10.0.1.115
+protocol=mariadbbackend
+port=3306
+extra_port=0
+persistpoolmax=0
+persistmaxtime=0
+proxy_protocol=false
+ssl=false
+ssl_version=MAX
+ssl_cert_verify_depth=9
+ssl_verify_peer_certificate=true
+rank=primary
+
+[dbserver02]
+type=server
+address=10.0.1.153
+protocol=mariadbbackend
+port=3306
+extra_port=0
+persistpoolmax=0
+persistmaxtime=0
+proxy_protocol=false
+ssl=false
+ssl_version=MAX
+ssl_cert_verify_depth=9
+ssl_verify_peer_certificate=true
+rank=primary
+
+[dbserver03]
+type=server
+address=10.0.1.132
+protocol=mariadbbackend
+port=3306
+extra_port=0
+persistpoolmax=0
+persistmaxtime=0
+proxy_protocol=false
+ssl=false
+ssl_version=MAX
+ssl_cert_verify_depth=9
+ssl_verify_peer_certificate=true
+rank=primary

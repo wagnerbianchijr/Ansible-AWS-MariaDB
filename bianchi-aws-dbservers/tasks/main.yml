@@ -1,0 +1,5 @@
+---
+# tasks file for bianchi-aws-servers
+ - import_tasks: dbs.yml
+ - import_tasks: usr.yml
+ - import_tasks: rel.yml

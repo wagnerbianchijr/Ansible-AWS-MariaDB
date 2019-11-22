@@ -1,0 +1,15 @@
+- name: Moving up users definitions on Master database server  ([dbserver01])
+  copy:
+    src: mariadb_users_definition.sql
+    dest: /root/mariadb_users_definition.sql
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname == 'dbserver01'
+
+- name: Creating user on the Master datababe server ([dbserver01])
+  shell: mysql < /root/mariadb_users_definition.sql -vvv
+  register: cmd_mariadb_create_users
+  when: inventory_hostname == 'dbserver01'
+
+- debug: msg="{{ cmd_mariadb_create_users }}"

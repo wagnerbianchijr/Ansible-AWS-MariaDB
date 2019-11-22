@@ -1,0 +1,5 @@
+---
+# vars file for bianchi-aws-servers
+users:
+  - { name: root,     path: /root/ }
+  - { name: ec2-user, path: /home/ec2-user/ }

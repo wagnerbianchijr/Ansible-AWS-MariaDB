@@ -1,0 +1,17 @@
+[maxscale]
+threads                     = auto
+log_augmentation            = 1
+ms_timestamp                = 1
+syslog                      = 1
+
+[rwsplit-service]
+type                        = service
+router                      = readwritesplit
+user                        = maxusr
+password                    = {{ cmd_maxpwd_maxusr.stdout }}
+max_sescmd_history          = 1500
+causal_reads                = true
+causal_reads_timeout        = 60
+master_reconnection         = true
+prune_sescmd_history        = true
+master_failure_mode         = fail_on_write

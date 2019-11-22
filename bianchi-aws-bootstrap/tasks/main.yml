@@ -1,0 +1,8 @@
+---
+# tasks file for /etc/ansible/roles/aws-bootstrap
+ - import_tasks: vpc.yml
+ - import_tasks: igw.yml
+ - import_tasks: sbt.yml
+ - import_tasks: rtt.yml
+ - import_tasks: sgp.yml
+ - import_tasks: ec2.yml

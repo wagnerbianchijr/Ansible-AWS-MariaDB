@@ -1,0 +1,13 @@
+- name: Route IGW
+  ec2_vpc_route_table:
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    subnets:
+      - "{{ sbt_id }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ igw_id }}"
+    tags:
+      Name: "{{ route_name }}"
